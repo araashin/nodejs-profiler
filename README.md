@@ -1,7 +1,7 @@
 # Node.js를 활용한 Profiler 프로그램 분석
 
 > **제출자:** 20230851 신아라
-> **과목:** 웹응용기
+> **과목:** 웹응용기술
 > **수강반:** 001
 > **제출일:** 2024년 6월 9일  
 > **GitHub 링크:** https://github.com/araashin/nodejs-profiler
