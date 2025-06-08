@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Javaweb Profiler</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .btn {
+      margin: 5px 4px;
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: white;
+      cursor: pointer;
+    }
+    .btn.active {
+      background-color: #007bff;
+      color: white;
+    }
+    .section {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Node.js Profiler</h2>
+
+  <div style="display: flex;">
+    <!-- 왼쪽: 버튼 영역 -->
+    <div style="flex: 1; max-width: 280px;">
+      <!-- Chart type selection -->
+      <div class="section">
+        <label>Chart Type:</label>
+        <button class="btn chart-btn active" data-type="bar">bar</button>
+        <button class="btn chart-btn" data-type="line">line</button>
+        <button class="btn chart-btn" data-type="polarArea">polarArea</button>
+        <button class="btn chart-btn" data-type="pie">pie</button>
+        <button class="btn chart-btn" data-type="doughnut">doughnut</button>
+      </div>
+
+      <!-- Core selection -->
+      <div class="section">
+        <label>Select Core:</label>
+        <% Object.keys(result).filter(key => key.startsWith('core')).forEach(core => { %>
+          <button class="btn core-btn" data-core="<%= core %>"><%= core %></button>
+        <% }) %>
+      </div>
+
+      <!-- Task selection -->
+      <div class="section">
+        <label>Select Task:</label>
+        <% 
+          const firstCoreKey = Object.keys(result).find(k => k.startsWith('core'));
+          const taskCount = firstCoreKey ? result[firstCoreKey].length : 0;
+          for (let i = 1; i <= taskCount; i++) {
+        %>
+          <button class="btn task-btn" data-task="<%= i %>">task<%= i %></button>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- 오른쪽 차트 영역 -->
+    <div style="flex: 3; display: flex; align-items: center; justify-content: center;">
+      <canvas id="myChart" width="800" height="500"></canvas>
+    </div>
+  </div>
+
+
+  <!-- Chart area -->
+  <canvas id="myChart"></canvas>
+
+  <script>
+    const rawData = <%- JSON.stringify(result) %>;
+    let currentChart;
+    let chartType = 'bar';
+    let selectedCore = Object.keys(rawData).find(k => k.startsWith('core'));
+    let selectedTask = 1;
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    function drawChartByCore(core) {
+      const labels = rawData[core].map((_, idx) => `task${idx + 1}`);
+      const minData = rawData[core].map(task => task.min);
+      const maxData = rawData[core].map(task => task.max);
+      const avgData = rawData[core].map(task => task.avg);
+      const stdData = rawData[core].map(task => task.std);
+
+      if (['polarArea', 'pie', 'doughnut'].includes(chartType)) {
+        renderSingleDatasetChart(labels, avgData, `${core}의 task별 평균`);
+      } else {
+        renderChart(labels, minData, maxData, avgData, stdData, `${core}의 모든 Task 정보`);
+      }
+    }
+
+    function drawChartByTask(taskNum) {
+      const cores = Object.keys(rawData).filter(k => k.startsWith('core'));
+      const minData = cores.map(core => rawData[core][taskNum - 1].min);
+      const maxData = cores.map(core => rawData[core][taskNum - 1].max);
+      const avgData = cores.map(core => rawData[core][taskNum - 1].avg);
+      const stdData = cores.map(core => rawData[core][taskNum - 1].std);
+
+      if (['polarArea', 'pie', 'doughnut'].includes(chartType)) {
+        renderSingleDatasetChart(cores, avgData, `task${taskNum}의 core별 평균`);
+      } else {
+        renderChart(cores, minData, maxData, avgData, stdData, `task${taskNum}의 모든 Core 정보`);
+      }
+    }
+
+    function renderChart(labels, minData, maxData, avgData, stdData, title) {
+      if (currentChart) currentChart.destroy();
+      currentChart = new Chart(ctx, {
+        type: chartType,
+        data: {
+          labels,
+          datasets: [
+            { label: 'Min', data: minData, backgroundColor: 'rgba(54, 162, 235, 0.5)' },
+            { label: 'Max', data: maxData, backgroundColor: 'rgba(255, 99, 132, 0.5)' },
+            { label: 'Avg', data: avgData, backgroundColor: 'rgba(75, 192, 192, 0.5)' },
+            { label: 'Std', data: stdData, backgroundColor: 'rgba(255, 206, 86, 0.5)' }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: title }
+          },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function renderSingleDatasetChart(labels, data, title) {
+      if (currentChart) currentChart.destroy();
+      currentChart = new Chart(ctx, {
+        type: chartType,
+        data: {
+          labels,
+          datasets: [{
+            label: title,
+            data,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.5)',
+              'rgba(54, 162, 235, 0.5)',
+              'rgba(255, 206, 86, 0.5)',
+              'rgba(75, 192, 192, 0.5)',
+              'rgba(153, 102, 255, 0.5)'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: title }
+          }
+        }
+      });
+    }
+
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        chartType = btn.dataset.type;
+        drawChartByCore(selectedCore);
+      });
+    });
+
+    document.querySelectorAll('.core-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.core-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCore = btn.dataset.core;
+        drawChartByCore(selectedCore);
+      });
+    });
+
+    document.querySelectorAll('.task-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.task-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTask = parseInt(btn.dataset.task);
+        drawChartByTask(selectedTask);
+      });
+    });
+
+    drawChartByCore(selectedCore);
+  </script>
+</body>
+</html>
