@@ -27,7 +27,7 @@
 
 
 ### 📂 주요 파일 구성
-node_project/
+<pre>node_project/
 ├── uploads/            # 업로드된 텍스트 파일 저장 위치
 ├── input_example/      # 샘플 텍스트 파일들 (입력 예제)
 ├── views/              # EJS 기반 뷰 템플릿  
@@ -37,7 +37,7 @@ node_project/
 ├── parser.js           # 텍스트 분석 및 DB 저장 로직
 ├── upload.js           # 파일 업로드 처리
 ├── db.js               # MySQL 연결 정보 설정
-├── package.json        # 프로젝트 의존성 관리
+├── package.json        # 프로젝트 의존성 관리 </pre>
 
 ---
 
