@@ -11,41 +11,65 @@
 
 ---
 
-## 1. 수행 절차 분석
+## 1. How to Start?
 
-### 📂 전체 흐름:
-1. 사용자가 웹에서 `inputFile.txt`를 업로드
-2. 서버에서 파일을 읽고 통계 분석 (MIN, MAX, AVG, STD)
-3. 결과를 DB(MySQL)에 저장
-4. 분석 결과를 `Chart.js`를 통해 시각화
+### Requirements
+Node.js (v16 이상)
+MySQL (로컬 설치)
+인터넷 연결 (CDN을 통한 chart.js 사용)
+
+프로젝트 실행을 위해 먼저 MySQL을 설치하고 profiler_db 데이터베이스를 생성해야 합니다. 이후 db.js에서 사용자 환경에 맞게 DB 정보를 수정한 뒤, 터미널에서 npm install로 패키지를 설치하고 node app.js 명령어로 서버를 실행하면 웹브라우저를 통해 프로파일링 기능을 사용할 수 있습니다.
+
 
 ### 📂 주요 파일 구성
-- `app.js`: 메인 서버 진입점
-- `upload.js`: 업로드 처리 라우팅
-- `parser.js`: 통계 계산 및 DB 저장
-- `views/index.ejs`: 업로드 UI
-- `views/result.ejs`: 결과 시각화
-- `db.js`: DB 연결 설정
+node_project/
+├── uploads/             # 업로드된 inputFile.txt 저장 위치
+├── input_example/       # 샘플 텍스트 파일들
+├── views/               # EJS 기반 뷰 템플릿
+├── app.js               # 서버 진입점
+├── parser.js            # 텍스트 분석 및 DB 저장 로직
+├── upload.js            # 파일 업로드 처리
+├── db.js                # MySQL 연결 정보
 
 ---
 
-## 2. 소스 코드 설명
+## 2. 사용 방법
 
-### 📌 parser.js
-- `calcStats()`: 평균 및 표준편차 계산 함수
-- `insertToDB()`: 통계 결과 DB 저장 함수
+1. 웹에서 inputFile.txt 또는 샘플 파일 업로드
 
-### 📌 result.ejs
-- `Chart.js`를 사용하여 Core별 Task 결과 시각화
+2. core / task 선택
 
-### 📌 DB 구조
+3. 차트 유형 선택 (bar, line, pie, etc.)
+
+4. 그래프 확인
+
+## 📌 DB 구조
 ```sql
 CREATE TABLE profiler_data (
   id INT AUTO_INCREMENT PRIMARY KEY,
   core VARCHAR(10),
   task INT,
-  min INT,
-  max INT,
+  min FLOAT,
+  max FLOAT,
   avg FLOAT,
   std FLOAT
 );
+
+```
+
+## 🛠 기술 스택
+
+Node.js + Express
+
+MySQL
+
+Chart.js
+
+EJS
+
+Multer (파일 업로드)
+
+## 🧑‍💻 개발자
+개발자 : 20230851 신아라 
+
+
