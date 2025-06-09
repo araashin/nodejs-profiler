@@ -1,4 +1,4 @@
-# Node.js 기반 Profiler 프로그램
+# Node.js 기반 Profiler 프로그램 분석 과제 (웹응용기술)
 
 ## 0. 프로그램 개요
 업로드된 성능 데이터 파일을 분석하여 각 Core, Task 별 평균(AVG) 및 표준편차(STD)를 계산하고, 이를 시각화하는 웹 기반 프로파일러입니다.
@@ -14,22 +14,30 @@
 ## 1. How to Start?
 
 ### Requirements
-Node.js (v16 이상)
-MySQL (로컬 설치)
-인터넷 연결 (CDN을 통한 chart.js 사용)
+● Node.js (v16 이상)
+● MySQL (로컬 설치)
+● 인터넷 연결 (CDN을 통한 Chart.js 사용)
 
-프로젝트 실행을 위해 먼저 MySQL을 설치하고 profiler_db 데이터베이스를 생성해야 합니다. 이후 db.js에서 사용자 환경에 맞게 DB 정보를 수정한 뒤, 터미널에서 npm install로 패키지를 설치하고 node app.js 명령어로 서버를 실행하면 웹브라우저를 통해 프로파일링 기능을 사용할 수 있습니다.
+1. MySQL을 설치한 후 profiler_db 데이터베이스를 생성해야 합니다.
+2. db.js에서 본인의 환경에 맞게 DB 연결 정보를 수정합니다.
+3. 프로젝트 루트 디렉토리에서 다음 명령어를 순차적으로 실행합니다
+   
+   $ npm install         # 의존성 패키지 설치
+   $ node app.js         # 서버 실행
 
 
 ### 📂 주요 파일 구성
 node_project/
-├── uploads/             # 업로드된 inputFile.txt 저장 위치
-├── input_example/       # 샘플 텍스트 파일들
-├── views/               # EJS 기반 뷰 템플릿
-├── app.js               # 서버 진입점
-├── parser.js            # 텍스트 분석 및 DB 저장 로직
-├── upload.js            # 파일 업로드 처리
-├── db.js                # MySQL 연결 정보
+├── uploads/            # 업로드된 텍스트 파일 저장 위치
+├── input_example/      # 샘플 텍스트 파일들 (입력 예제)
+├── views/              # EJS 기반 뷰 템플릿  
+│   └── result.ejs
+│   └── index.ejs
+├── app.js              # 서버 진입점
+├── parser.js           # 텍스트 분석 및 DB 저장 로직
+├── upload.js           # 파일 업로드 처리
+├── db.js               # MySQL 연결 정보 설정
+├── package.json        # 프로젝트 의존성 관리
 
 ---
 
